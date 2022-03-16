@@ -1,0 +1,6 @@
+---
+- name: update package
+  hosts: k8s_controller
+  tasks:
+    - ansible.builtin.import_role:
+        name: m4eba.common.disable_swap

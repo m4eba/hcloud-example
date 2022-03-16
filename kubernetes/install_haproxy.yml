@@ -1,0 +1,38 @@
+---
+- name: install keepalived
+  remote_user: root
+  hosts: keepalived
+  tasks:
+    - ansible.builtin.shell: basename -a /sys/class/net/* | grep enp
+      register: interface_output
+    - ansible.builtin.set_fact:
+        keepalived_network_interface: '{{interface_output.stdout}}'
+    - ansible.builtin.import_role:
+        name: m4eba.haproxy.hcloud_routing
+    - ansible.builtin.import_role:
+        name: m4eba.haproxy.keepalived
+    # there could be timing problems with the hcloud routing
+    # verify the route after 5 seconds
+    - ansible.builtin.pause:
+        seconds: 5
+    - ansible.builtin.import_role:
+        name: m4eba.haproxy.hcloud_verify
+- name: install haproxy
+  remote_user: root
+  hosts: haproxy
+  tasks:
+    - ansible.builtin.import_role:
+        name: m4eba.haproxy.ip_config
+      notify: restart haproxy
+    - ansible.builtin.import_role:
+        name: m4eba.haproxy.haproxy
+    - ansible.builtin.template:
+        src: 'haproxy_controller.cfg.j2'
+        dest: '/etc/haproxy/haproxy_controller.cfg'
+        mode: '0644'
+      notify: restart haproxy
+  handlers:
+    - name: restart haproxy
+      systemd:
+        name: haproxy
+        state: restarted

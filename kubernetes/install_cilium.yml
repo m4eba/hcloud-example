@@ -1,0 +1,7 @@
+---
+- name: install cilium
+  hosts: k8s_controller
+  run_once: true
+  tasks:
+    - ansible.builtin.import_role:
+        name: m4eba.kubernetes.cilium

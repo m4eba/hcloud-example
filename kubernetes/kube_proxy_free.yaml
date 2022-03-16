@@ -1,0 +1,6 @@
+---
+- name: cilium as kube proxy replacement
+  hosts: k8s_controller k8s_worker
+  tasks:
+    - ansible.builtin.import_role:
+        name: m4eba.keepalived.cilium_kube_proxy_free

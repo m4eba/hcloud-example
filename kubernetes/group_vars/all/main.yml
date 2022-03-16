@@ -1,0 +1,27 @@
+ansible_ssh_user: root
+
+#etcd
+etcd_ip: '{{subnet_ip}}'
+
+#hcloud routing
+virtual_ip_subnet: 10.0.1.0/24
+
+# keepalived
+keepalived_ip: '{{subnet_ip}}'
+keepalived_virtual_ip: 10.0.1.1
+keepalived_process_name: 'haproxy'
+keepalived_notify: '/usr/local/bin/notify'
+keepalived_notify_master_rx_lower_pri: '/usr/local/bin/masterrx'
+
+#kubernetes
+kubernetes_ip: '{{subnet_ip}}'
+kubernetes_load_balancer_ip: '{{keepalived_virtual_ip}}'
+kubernetes_load_balancer_port: 6556
+kubernetes_etcd_prefix: '/kubernetes_hcloud_example'
+kubernetes_nodeport_addresses:
+  - '10.0.0.0/8'
+kubernetes_cloud_provider: 'external'
+
+# hcloud
+hcloud_network_name: '{{network_name}}'
+hcloud_with_networks: true

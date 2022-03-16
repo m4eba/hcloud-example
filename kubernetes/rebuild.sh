@@ -1,0 +1,1 @@
+hcloud server list -o noheader -o columns=name | grep "kubernetes-4vps" | while read -r name; do hcloud server rebuild --image ubuntu-20.04 "$name"; done

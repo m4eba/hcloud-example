@@ -1,0 +1,3 @@
+---
+- name: install etcd
+  ansible.builtin.import_playbook: m4eba.etcd.cluster

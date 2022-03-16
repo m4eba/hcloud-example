@@ -1,0 +1,8 @@
+listen controller_api_server
+    bind {{keepalived_virtual_ip}}:{{kubernetes_load_balancer_port}}
+    mode tcp
+    option httpchk HEAD /
+    option ssl-hello-chk
+{% for s in groups['k8s_controller'] %}
+    server {{s}} {{ hostvars[s].subnet_ip }}:6443 maxconn 100 check 
+{% endfor %}

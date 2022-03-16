@@ -1,0 +1,4 @@
+---
+collections:
+  - name: m4eba.haproxy
+  - name: m4eba.common

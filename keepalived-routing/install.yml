@@ -1,0 +1,24 @@
+---
+- name: install keepalived
+  remote_user: root
+  hosts: keepalived
+  vars:
+    keepalived_virtual_ip: 10.0.1.1
+    virtual_ip_subnet: 10.0.1.0/24
+    keepalived_process_name: 'keepalived'
+    keepalived_notify: '/usr/local/bin/notify'
+    keepalived_notify_master_rx_lower_pri: '/usr/local/bin/masterrx'
+  tasks:
+    # need to set this here, so that hostvars gets set
+    - ansible.builtin.set_fact:
+        keepalived_ip: '{{subnet_ip}}'
+    - ansible.builtin.shell: basename -a /sys/class/net/* | grep enp
+      register: interface_output
+    - ansible.builtin.set_fact:
+        keepalived_network_interface: '{{interface_output.stdout}}'
+    - ansible.builtin.import_role:
+        name: m4eba.common.update_package_cache
+    - ansible.builtin.import_role:
+        name: m4eba.haproxy.hcloud_routing
+    - ansible.builtin.import_role:
+        name: m4eba.haproxy.keepalived

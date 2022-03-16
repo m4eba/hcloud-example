@@ -1,0 +1,4 @@
+%{ for index, c in server ~}
+${server_name}${index+1} ansible_host=${c.ipv4_address} subnet_ip=${subnet[index].ip} %{if attach_volume }volume=${volume[index].linux_device}%{endif}
+%{ endfor ~}
+

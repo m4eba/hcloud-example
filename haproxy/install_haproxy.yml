@@ -1,0 +1,45 @@
+---
+- name: install keepalived
+  remote_user: root
+  hosts: keepalived
+  vars:
+    keepalived_virtual_ip: 10.0.1.1
+    virtual_ip_subnet: 10.0.1.0/24
+    keepalived_process_name: 'haproxy'
+    keepalived_notify: '/usr/local/bin/notify'
+    keepalived_notify_master_rx_lower_pri: '/usr/local/bin/masterrx'
+  tasks:
+    # need to set this here, so that hostvars gets set
+    - ansible.builtin.set_fact:
+        keepalived_ip: '{{ subnet_ip }}'
+    - ansible.builtin.shell: basename -a /sys/class/net/* | grep enp
+      register: interface_output
+    - ansible.builtin.set_fact:
+        keepalived_network_interface: '{{ interface_output.stdout }}'
+    - ansible.builtin.import_role:
+        name: m4eba.common.update_package_cache
+    - ansible.builtin.import_role:
+        name: m4eba.haproxy.hcloud_routing
+    - ansible.builtin.import_role:
+        name: m4eba.haproxy.keepalived
+- name: install haproxy
+  remote_user: root
+  hosts: haproxy
+  vars:
+    keepalived_virtual_ip: 10.0.1.1
+  tasks:
+    - ansible.builtin.import_role:
+        name: m4eba.haproxy.ip_config
+      notify: restart haproxy
+    - ansible.builtin.import_role:
+        name: m4eba.haproxy.haproxy
+    - ansible.builtin.template:
+        src: 'haproxy_nginx.cfg.j2'
+        dest: '/etc/haproxy/haproxy_nginx.cfg'
+        mode: '0644'
+      notify: restart haproxy
+  handlers:
+    - name: restart haproxy
+      systemd:
+        name: haproxy
+        state: restarted

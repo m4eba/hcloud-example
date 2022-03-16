@@ -1,0 +1,27 @@
+---
+- name: install nginx
+  remote_user: root
+  hosts: nginx
+  tasks:
+    - ansible.builtin.import_role:
+        name: m4eba.common.update_package_cache
+    - ansible.builtin.package:
+        name: nginx
+    - ansible.builtin.file:
+        path: /etc/nginx/sites-enabled/default
+        state: absent
+      notify: restart nginx
+    - ansible.builtin.template:
+        src: site.j2
+        dest: /etc/nginx/sites-enabled/site
+        mode: '0644'
+      notify: restart nginx
+    - ansible.builtin.template:
+        src: index.html.j2
+        dest: /var/www/html/index.html
+        mode: '0644'
+  handlers:
+    - name: restart nginx
+      ansible.builtin.systemd:
+        name: nginx
+        state: restarted

@@ -1,0 +1,9 @@
+listen nginx
+    bind {{keepalived_virtual_ip}}:80
+    mode tcp
+    option httpchk HEAD /
+{% filter indent(width=4) %}
+{% for s in groups['nginx'] %}
+server {{s}} {{ hostvars[s].subnet_ip }}:80 maxconn 100 check 
+{% endfor %}
+{% endfilter %}

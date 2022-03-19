@@ -2,6 +2,7 @@
 - ansible.builtin.import_playbook: install_prepare.yml
 - ansible.builtin.import_playbook: install_etcd.yml
 - ansible.builtin.import_playbook: install_haproxy.yml
+- ansible.builtin.import_playbook: install_etcd_pki.yml
 - ansible.builtin.import_playbook: install_kubernetes.yml
 - ansible.builtin.import_playbook: install_cilium.yml
 - ansible.builtin.import_playbook: install_hcloud.yml

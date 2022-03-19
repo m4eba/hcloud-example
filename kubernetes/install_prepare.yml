@@ -10,19 +10,3 @@
   tasks:
     - ansible.builtin.import_role:
         name: m4eba.common.disable_swap
-- name: etcd pki
-  hosts: k8s_controller
-  vars:
-    etcd_pki_destination: /etc/kubernetes/pki/etcd
-    etcd_running: false
-  tasks:
-    - ansible.builtin.stat:
-        path: '{{etcd_pki_destination}}/etcd.key'
-      register: etcd_pki_stat
-    - ansible.builtin.file:
-        path: '{{etcd_pki_destination}}'
-        state: directory
-      when: etcd_pki_stat.stat.exists == false
-    - ansible.builtin.import_role:
-        name: m4eba.etcd.pki
-      when: etcd_pki_stat.stat.exists == false

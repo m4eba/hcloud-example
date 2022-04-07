@@ -1,0 +1,5 @@
+wireguard_ip: 10.8.0.101
+wireguard_network_interface: enp7s0
+wireguard_endpoint: '{{ ansible_host }}'
+wireguard_allowed_ips: 
+ - 10.0.0.0/24

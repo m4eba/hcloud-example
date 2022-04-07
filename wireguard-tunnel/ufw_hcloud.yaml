@@ -1,0 +1,75 @@
+---
+- name: ufw
+  hosts: vps1, vps2
+  tasks:
+    - name: install ufw
+      ansible.builtin.apt:
+        name: ufw
+        state: present
+
+    - name: configure defaults
+      community.general.ufw:
+        direction: '{{ item.direction }}'
+        policy: '{{ item.policy }}'
+        interface: '{{ item.interface }}'
+      with_items:
+        - { direction: 'incoming', policy: 'deny', interface: 'eth0' }
+        - { direction: 'outgoing', policy: 'allow', interface: 'eth0' }
+      notify:
+        - restart ufw
+
+    - name: allow internal network
+      community.general.ufw:
+        rule: allow
+        src: 10.0.0.0/8
+      notify:
+        - restart ufw
+
+    - name: allow traffic from local network
+      community.general.ufw:
+        rule: allow
+        src: 192.168.0.0/24
+      notify:
+        - restart ufw
+
+    - name: configure ufw rules
+      community.general.ufw:
+        rule: '{{ item.rule }}'
+        port: '{{ item.port }}'
+        proto: '{{ item.proto }}'
+      with_items:
+        - { rule: 'limit', port: '22', proto: 'tcp' }
+        - { rule: 'allow', port: '80', proto: 'tcp' }
+      notify:
+        - restart ufw
+
+    - name: Enable ufw logging
+      community.general.ufw: logging=on
+      notify:
+        - restart ufw
+
+    - name: Enable ufw
+      community.general.ufw: state=enabled
+
+  handlers:
+    - name: restart ufw
+      ansible.builtin.service: 
+        name: ufw 
+        state: restarted
+
+- name: ufw for wireguard
+  hosts: vps1
+  tasks:
+    - name: configure ufw rules
+      community.general.ufw:
+        rule: allow
+        port: 51829
+        proto: tcp
+      notify:
+        - restart ufw
+  
+  handlers:
+    - name: restart ufw
+      ansible.builtin.service: 
+        name: ufw 
+        state: restarted

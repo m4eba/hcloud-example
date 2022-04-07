@@ -1,0 +1,5 @@
+wireguard_ip: 10.8.0.1
+wireguard_network_interface: eth0
+wireguard_keepalive: 30
+wireguard_allowed_ips:
+  - 192.168.0.0/24

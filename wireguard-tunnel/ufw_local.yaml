@@ -1,0 +1,68 @@
+---
+- name: ufw
+  hosts: pi
+  become: true
+  tasks:
+    - name: install ufw
+      ansible.builtin.apt:
+        name: ufw
+        state: present
+
+    - name: configure defaults
+      community.general.ufw:
+        direction: '{{ item.direction }}'
+        policy: '{{ item.policy }}'
+        interface: '{{ item.interface }}'
+      with_items:
+        - { direction: 'incoming', policy: 'allow', interface: 'eth0' }
+        - { direction: 'outgoing', policy: 'allow', interface: 'eth0' }
+        - { direction: 'incoming', policy: 'deny', interface: 'wg0' }
+      notify:
+        - restart ufw
+
+    - name: configure ufw rules
+      community.general.ufw:
+        rule: '{{ item.rule }}'
+        port: '{{ item.port }}'
+        proto: '{{ item.proto }}'
+      with_items:
+        - { rule: 'limit', port: '22', proto: 'tcp' }
+        - { rule: 'allow', port: '5667', proto: 'tcp' }
+      notify:
+        - restart ufw
+
+    - name: enable outgoing to hcloud
+      community.general.ufw:
+        rule: allow
+        route: yes
+        src: 192.168.0.0/24
+        dest: 10.0.0.0/8
+      notify:
+        - restart ufw
+      
+    - name: enable incoming forwarding
+      community.general.ufw:
+        rule: allow
+        route: yes
+        # use /8 to cover 10.8.0.0/24 and 10.0.0.0/24
+        src: 10.0.0.0/8
+        dest: 192.168.0.103
+        port: 3000
+        proto: tcp
+      notify:
+        - restart ufw
+
+    - name: Enable ufw logging
+      community.general.ufw: logging=on
+      notify:
+        - restart ufw
+
+    - name: Enable ufw
+      community.general.ufw: state=enabled
+
+  handlers:
+    - name: restart ufw
+      ansible.builtin.service: 
+        name: ufw 
+        state: restarted
+

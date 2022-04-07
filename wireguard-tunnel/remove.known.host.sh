@@ -1,0 +1,1 @@
+hcloud server list -o noheader -o columns=name,ipv4 | grep "wireguard" | while read -r name ip; do ssh-keygen -f ~/.ssh/known_hosts -R "$ip" ; done 

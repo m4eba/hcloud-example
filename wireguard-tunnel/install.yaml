@@ -1,0 +1,38 @@
+---
+- name: enable tunnel config
+  hosts: wireguard
+  tasks:
+    - ansible.builtin.import_role:
+        name: m4eba.wireguard.tunnel_config
+- name: install
+  hosts: wireguard
+  tasks:
+    #- ansible.builtin.import_role:
+    #    name: m4eba.wireguard.install
+- name: hcloud routing
+  hosts: localhost
+  connection: local
+  gather_facts: no
+  vars:
+    wireguard_routing_allowed_ips_from_host: pi
+    wireguard_routing_gateway: "{{ hostvars['vps1'].subnet_ip }}"
+  tasks:
+    - ansible.builtin.import_role:
+        name: m4eba.wireguard.hcloud_routing
+- name: routing for vps
+  hosts: vps2
+  vars:
+    wireguard_routing_allowed_ips_from_host: pi
+    wireguard_routing_gateway: 10.0.0.1
+  tasks:
+    - ansible.builtin.import_role:
+        name: m4eba.wireguard.routing
+
+- name: routing for local
+  hosts: localhost
+  vars:
+    wireguard_routing_allowed_ips_from_host: vps1
+    wireguard_routing_gateway: 192.168.0.100
+  tasks:
+    - ansible.builtin.import_role:
+        name: m4eba.wireguard.routing

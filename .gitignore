@@ -4,3 +4,4 @@ terraform.tfstate*
 ansible_collections
 inventory
 *.inventory
+terraform_generated.yaml

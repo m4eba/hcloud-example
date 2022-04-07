@@ -1,0 +1,7 @@
+---
+collections:
+  - name: ansible.posix
+  - name: m4eba.haproxy
+  - name: m4eba.common
+  - name: m4eba.etcd
+  - name: m4eba.patroni

@@ -1,0 +1,5 @@
+---
+- ansible.builtin.import_playbook: install_etcd.yaml
+- ansible.builtin.import_playbook: install_haproxy.yaml
+- ansible.builtin.import_playbook: install_etcd_pki.yaml
+- ansible.builtin.import_playbook: install_patroni.yaml

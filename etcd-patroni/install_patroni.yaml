@@ -1,0 +1,28 @@
+---
+- name: generate endpoints list
+  hosts: localhost
+  tasks:
+    - name: init
+      ansible.builtin.set_fact:
+        etcd_endpoints: []
+    - name: loop
+      ansible.builtin.set_fact:
+        etcd_endpoints: '{{ etcd_endpoints + [ hostvars[item]["subnet_ip"]+":2379" ] }}'
+      loop: '{{ groups["etcd"] }}'
+    - name: joint list
+      ansible.builtin.set_fact:
+        etcd_endpoints: '{{ etcd_endpoints | join(",") }}'
+    - debug:
+        var: etcd_endpoints
+- name: set endpoints
+  hosts: patroni
+  tasks:
+    - name: set etcd_hosts
+      ansible.builtin.set_fact:
+        patroni_etcd_hosts: '{{ hostvars["localhost"]["etcd_endpoints"] }}'
+    - name: set ip
+      ansible.builtin.set_fact:
+        patroni_ip: '{{ subnet_ip }}'
+    - ansible.builtin.import_role:
+        name: m4eba.patroni.install
+      

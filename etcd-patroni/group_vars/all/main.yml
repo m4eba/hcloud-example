@@ -1,0 +1,22 @@
+ansible_ssh_user: root
+
+#etcd
+etcd_ip: '{{subnet_ip}}'
+etcd_ca_cert_path: ~/.ssh/etcd-patroni-example
+
+
+#hcloud routing
+virtual_ip_subnet: 10.0.1.0/24
+
+# keepalived
+keepalived_ip: '{{subnet_ip}}'
+keepalived_virtual_ip: 10.0.1.1
+keepalived_process_name: 'haproxy'
+keepalived_notify: '/usr/local/bin/notify'
+keepalived_notify_master_rx_lower_pri: '/usr/local/bin/masterrx'
+
+# patroni
+patroni_etcd_protocol: https
+patroni_etcd_key: /etc/etcd-pki/etcd.key
+patroni_etcd_cacert: /etc/etcd-pki/ca.crt
+patroni_etcd_cert: /etc/etcd-pki/etcd.crt

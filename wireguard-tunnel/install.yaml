@@ -7,8 +7,8 @@
 - name: install
   hosts: wireguard
   tasks:
-    #- ansible.builtin.import_role:
-    #    name: m4eba.wireguard.install
+    - ansible.builtin.import_role:
+        name: m4eba.wireguard.install
 - name: hcloud routing
   hosts: localhost
   connection: local
